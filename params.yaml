@@ -8,7 +8,7 @@ wait_between_steps_secs: 120
 ### alert params ###
 
 # the gmail account you will send your text message from
-sender_email:
+sender_email: 
 # your gmail app password. Go to your google acct > Security > Signing in to Google > App passwords to generate a pw
 sender_email_pw:
 # the number where you will text alerts

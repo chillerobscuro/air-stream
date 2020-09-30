@@ -1,5 +1,6 @@
 import requests
 import time
+import yaml
 
 
 def printer(temp_f, aqi, label, outdoor_f, outdoor_aqi):
@@ -76,7 +77,6 @@ def calc_aqi(cp, ih, il, bph, bpl):
 
 def send_text_message(dest_phone_number, from_email, email_pw, aqi, label, thresh):
     import smtplib
-    import time
     # Establish a secure session with gmail's outgoing SMTP server using your gmail account
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
@@ -97,8 +97,7 @@ def write_to_log(msg, file='log.txt'):
         f.write(msg)
 
 
-def load_params(file='quick-purpleair/params.yaml'):
-    import yaml
+def load_params(file='params.yaml'):
     with open(file) as f:
         params = yaml.safe_load(f)
     return params
