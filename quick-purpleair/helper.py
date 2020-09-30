@@ -23,6 +23,9 @@ def get_data(sensor):
     # pull data for one sensor from purpleair.com
     response = requests.get(f'https://www.purpleair.com/json?show={sensor}')
     rsp = response.json()
+    if not rsp['results']:
+        print(f'No values for sensor number {sensor}')
+        return None
     rsp1, rsp2 = rsp['results'][0], rsp['results'][1]
     label = rsp1['Label']
     temp_f = int(rsp1['temp_f']) - 8  # purpleair customer support said to subtract 8 from the raw reading
@@ -36,13 +39,13 @@ def average_sensors(sensor_list):
     # Pull data for multiple sensors and return average temp_f and aqi
     vals = get_data(sensor_list[0])
     for i in range(1, len(sensor_list)):
-        try:
-            new_sensor_data = get_data(sensor_list[i])
+        new_sensor_data = get_data(sensor_list[i])
+        if not new_sensor_data:
+            # run function again without missing sensor
+            average_sensors([s for s in sensor_list if s != sensor_list[i]])
+        else:
             for v in ['temp_f', 'aqi']:
                 vals[v] = (vals[v]*i + new_sensor_data[v]) / float(i+1)  # calculate running average
-        except TypeError:
-            print(f'No data for sensor {sensor_list[i]}')
-            return None
     return vals
 
 
