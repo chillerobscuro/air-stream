@@ -1,0 +1,17 @@
+### basic params ###
+
+# to find sensor number, go to https://www.purpleair.com/map, click on a sensor, and find in URL after "select="
+sensor_number: 38777
+nearby_sensors: [36529, 38725, 17951, 38577]
+wait_between_steps_secs: 60
+
+### alert params ###
+
+# the gmail account you will send your text message from
+sender_email:
+# your gmail app password. Go to your google acct > Security > Signing in to Google > App passwords to generate a pw
+sender_email_pw:
+# the number where you will text alerts
+dest_phone_num:
+# what air quality threshold will trigger a text alert
+aqi_texting_threshold: 65
