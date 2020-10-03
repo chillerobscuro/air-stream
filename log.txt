@@ -1,4 +1,0 @@
-Text sent at: 2020-09-29 18:05:25 | AQI: 9 Threshold: 2
-Text sent at: 2020-09-29 19:10:02 | AQI: 12 Threshold: 11
-Text sent at: 2020-09-29 19:14:38 | AQI: 31 Threshold: 25
-Text sent at: 2020-09-29 20:54:57 | AQI: 9 Threshold: 1

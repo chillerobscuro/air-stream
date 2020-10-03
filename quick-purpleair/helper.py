@@ -6,7 +6,7 @@ import yaml
 def show_data(params, show_time=True, text=False):
     if show_time:
         print_time()
-    rsp = get_data(params['sensor_number'])
+    rsp = get_realtime_data(params['sensor_number'])
     if not rsp:
         print("Couldn't get data! Cancelling this round")
         return text
@@ -37,7 +37,7 @@ def print_time():
     print(f'\n{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
 
 
-def get_data(sensor):
+def get_realtime_data(sensor):
     # pull data for one sensor from purpleair.com
     response = requests.get(f'https://www.purpleair.com/json?show={sensor}')
     try:
@@ -50,20 +50,21 @@ def get_data(sensor):
     temp_f = int(rsp1['temp_f']) - 8  # purpleair customer support said to subtract 8 from the raw reading
     aqi_raw = (float(rsp1['PM2_5Value']) + float(rsp2['PM2_5Value'])) / 2.  # average the sensors
     aqi = aqi_from_pm(aqi_raw)
-    ret_dict = {'temp_f': temp_f, 'aqi': aqi, 'label': label}
+    humidity = rs1['humidity'] - rs1['humidity'] * .04  # 4% correction
+    ret_dict = {'temp_f': temp_f, 'aqi': aqi, 'humidity': humidity, 'label': label}
     return ret_dict
 
 
 def average_sensors(sensor_list):
     # Pull data for multiple sensors and return average temp_f and aqi
-    vals = get_data(sensor_list[0])
+    vals = get_realtime_data(sensor_list[0])
     for i in range(1, len(sensor_list)):
-        new_sensor_data = get_data(sensor_list[i])
+        new_sensor_data = get_realtime_data(sensor_list[i])
         if not new_sensor_data:
             # run function again without missing sensor
             average_sensors([s for s in sensor_list if s != sensor_list[i]])
         else:
-            for v in ['temp_f', 'aqi']:
+            for v in ['temp_f', 'aqi', 'humidity']:
                 vals[v] = (vals[v]*i + new_sensor_data[v]) / float(i+1)  # calculate running average
     return vals
 
@@ -111,7 +112,7 @@ def send_text_message(dest_phone_number, from_email, email_pw, aqi, label, thres
 
 
 def message_to_send(x, y):
-    return f'Close your windows, PM2.5 AQI at {x} is now {y}'
+    return f'PM2.5 AQI at {x} is now {y}'
 
 
 def write_to_log(msg, file='log.txt'):
