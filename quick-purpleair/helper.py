@@ -3,6 +3,24 @@ import time
 import yaml
 
 
+def show_data(params, show_time=True, text=False):
+    if show_time:
+        print_time()
+    rsp = get_data(params['sensor_number'])
+    if not rsp:
+        print("Couldn't get data! Cancelling this round")
+        return text
+    temp_f, aqi, label = rsp['temp_f'], rsp['aqi'], rsp['label']
+    # if not len(params['nearby_sensors']):
+    nearby_avg = average_sensors(params['nearby_sensors'])
+    outdoor_f, outdoor_aqi = nearby_avg['temp_f'], nearby_avg['aqi']
+    printer(temp_f, aqi, label, outdoor_f, outdoor_aqi)
+    if text and aqi >= params['aqi_texting_threshold']:
+        send_text_message(params['dest_phone_num'], params['sender_email'], params['sender_email_pw'],
+                          aqi, label, params['aqi_texting_threshold'])
+    return text and not aqi >= params['aqi_texting_threshold']  # return 0 if threshold text has been sent, else 1
+
+
 def printer(temp_f, aqi, label, outdoor_f, outdoor_aqi):
     # format the output data
     box_str = '-'*32
@@ -15,15 +33,16 @@ def printer(temp_f, aqi, label, outdoor_f, outdoor_aqi):
           f"{box_str}\n")
 
 
-def show_time():
-    print(f'{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
+def print_time():
+    print(f'\n{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
 
 
 def get_data(sensor):
     # pull data for one sensor from purpleair.com
     response = requests.get(f'https://www.purpleair.com/json?show={sensor}')
-    rsp = response.json()
-    if not rsp['results']:
+    try:
+        rsp = response.json()
+    except JSONDecodeError:
         print(f'No values for sensor number {sensor}')
         return None
     rsp1, rsp2 = rsp['results'][0], rsp['results'][1]
@@ -50,7 +69,7 @@ def average_sensors(sensor_list):
 
 
 def aqi_from_pm(pm25):
-    # Calculations taken from javascript example at
+    # Calculations taken from purpleair's javascript example at
     # https://docs.google.com/document/d/15ijz94dXJ-YAZLi9iZ_RaBwrZ4KtYeCy08goGBwnbCU/edit
     if pm25 < 0 or pm25 > 1000:
         print(f'PM2.5 {pm25} out of range')
