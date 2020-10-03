@@ -50,7 +50,8 @@ def get_realtime_data(sensor):
     temp_f = int(rsp1['temp_f']) - 8  # purpleair customer support said to subtract 8 from the raw reading
     aqi_raw = (float(rsp1['PM2_5Value']) + float(rsp2['PM2_5Value'])) / 2.  # average the sensors
     aqi = aqi_from_pm(aqi_raw)
-    humidity = rs1['humidity'] - rs1['humidity'] * .04  # 4% correction
+    humidity = float(rsp1['humidity'])
+    humidity = humidity - humidity * .04  # 4% correction
     ret_dict = {'temp_f': temp_f, 'aqi': aqi, 'humidity': humidity, 'label': label}
     return ret_dict
 
