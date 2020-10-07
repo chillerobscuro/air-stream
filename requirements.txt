@@ -1,5 +1,2 @@
 requests
-time
-sys
-smtplib
-yaml
+pyyaml
