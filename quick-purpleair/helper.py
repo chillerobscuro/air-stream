@@ -10,10 +10,10 @@ def show_data(params, show_time=True, text=False):
     if not rsp:
         print("Couldn't get data! Cancelling this round")
         return text
-    temp_f, aqi, label = rsp['temp_f'], rsp['aqi'], rsp['label']
+    temp_f, aqi, label, hum = rsp['temp_f'], rsp['aqi'], rsp['label'], rsp['humidity']
     # if not len(params['nearby_sensors']):
     nearby_avg = average_sensors(params['nearby_sensors'])
-    outdoor_f, outdoor_aqi = nearby_avg['temp_f'], nearby_avg['aqi']
+    outdoor_f, outdoor_aqi, outdoor_hum = nearby_avg['temp_f'], nearby_avg['aqi'], nearby_avg['humidity']
     printer(temp_f, aqi, label, outdoor_f, outdoor_aqi)
     if text and aqi >= params['aqi_texting_threshold']:
         send_text_message(params['dest_phone_num'], params['sender_email'], params['sender_email_pw'],
@@ -26,10 +26,10 @@ def printer(temp_f, aqi, label, outdoor_f, outdoor_aqi):
     box_str = '-'*32
     print(f"\n{box_str}\n"
           f"PurpleAir Data for {label}:\n\n"
-          f"   Indoor   |   Outdoor\n"
+          f"     Indoor   |   Outdoor\n"
           f"{box_str}\n"
-          f"   AQI: {aqi}{' '*3 if aqi<10 else ' '*2}|  {outdoor_aqi}\n"
-          f"  Temp: {temp_f}  |  {outdoor_f}\n"
+          f"     AQI: {aqi}{' '*3 if aqi<10 else ' '*2}|  {outdoor_aqi}\n"
+          f"    Temp: {temp_f}  |  {outdoor_f}\n"
           f"{box_str}\n")
 
 
@@ -42,8 +42,8 @@ def get_realtime_data(sensor):
     response = requests.get(f'https://www.purpleair.com/json?show={sensor}')
     try:
         rsp = response.json()
-    except JSONDecodeError:
-        print(f'No values for sensor number {sensor}')
+    except (JSONDecodeError, ConnectionError) as ee:
+        print(f'No values for sensor number {sensor}: {ee}')
         return None
     rsp1, rsp2 = rsp['results'][0], rsp['results'][1]
     label = rsp1['Label']
@@ -51,7 +51,7 @@ def get_realtime_data(sensor):
     aqi_raw = (float(rsp1['PM2_5Value']) + float(rsp2['PM2_5Value'])) / 2.  # average the sensors
     aqi = aqi_from_pm(aqi_raw)
     humidity = float(rsp1['humidity'])
-    humidity = humidity - humidity * .04  # 4% correction
+    humidity = int(humidity + humidity * .1)  # 10% correction
     ret_dict = {'temp_f': temp_f, 'aqi': aqi, 'humidity': humidity, 'label': label}
     return ret_dict
 
