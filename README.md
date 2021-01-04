@@ -1,5 +1,7 @@
 ## Quick PurpleAir
 
+<img src="./docs/pi.png" alt="Raspberry Pi setup" width="300">
+
 To run script and see current PM2.5 AQI and Temperature:
 
 `bash run.sh`
