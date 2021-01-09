@@ -14,4 +14,8 @@ To text alerts when AQI threshold is surpassed:
 
 `bash run.sh repeat text`
 
+To run on Raspberry Pi:
+
+`bash run.sh repeat text pi`
+
 Define your sensor number, air quality thresholds, and other options in `params.yaml`
