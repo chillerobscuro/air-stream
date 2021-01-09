@@ -3,3 +3,4 @@ pyyaml
 tabulate
 GPIO
 CharLCD
+smtplib
