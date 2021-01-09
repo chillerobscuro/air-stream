@@ -1,4 +1,4 @@
-## Quick PurpleAir
+## Realtime PurpleAir Data Display
 
 <img src="./docs/pi.png" alt="Raspberry Pi setup" width="300">
 

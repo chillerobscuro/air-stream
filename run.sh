@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python quick-purpleair/main.py "$1" "$2"
+python air_stream/run.py "$1" "$2" "$3"
