@@ -3,4 +3,3 @@ pyyaml
 tabulate
 RPi.GPIO
 RPLCD
-smtplib
