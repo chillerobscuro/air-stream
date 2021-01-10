@@ -14,7 +14,7 @@ To text alerts when AQI threshold is surpassed:
 
 `bash run.sh repeat text`
 
-To run on Raspberry Pi:
+To display on Raspberry Pi LCD screen:
 
 `bash run.sh repeat text pi`
 
