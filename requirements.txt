@@ -1,6 +1,6 @@
 requests
 pyyaml
 tabulate
-GPIO
-CharLCD
+RPi.GPIO
+RPLCD
 smtplib

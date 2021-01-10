@@ -67,8 +67,9 @@ def print_lcd(temp_f: float, aqi: float, outdoor_f: float, outdoor_aqi: float) -
     """
     Print to Rasperry Pi's LCD screen
     """
-    import CharLCD
-    import GPIO
+    from RPLCD.gpio import CharLCD
+    from RPi import GPIO
+    GPIO.setwarnings(False)
 
     lcd = CharLCD(
         cols=16,
