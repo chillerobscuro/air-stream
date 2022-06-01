@@ -62,10 +62,7 @@ def print_terminal(
     )
 
 
-def print_lcd(temp_f: float, aqi: float, outdoor_f: float, outdoor_aqi: float) -> None:
-    """
-    Print to Rasperry Pi's LCD screen
-    """
+def init_lcd():
     from RPLCD.gpio import CharLCD
     from RPi import GPIO
     GPIO.setwarnings(False)
@@ -78,6 +75,19 @@ def print_lcd(temp_f: float, aqi: float, outdoor_f: float, outdoor_aqi: float) -
         numbering_mode=GPIO.BOARD,
         compat_mode=True,
     )
+    return lcd
+
+
+def clear_lcd():
+    lcd = init_lcd()
+    lcd.clear()
+
+
+def print_lcd(temp_f: float, aqi: float, outdoor_f: float, outdoor_aqi: float) -> None:
+    """
+    Print to Rasperry Pi's LCD screen
+    """
+    lcd = init_lcd()
     aqi_str = f" AQI: {aqi} / {round(outdoor_aqi, 1)}"
     temp_str = f"\r\nTemp: {temp_f} / {round(outdoor_f, 1)}"
     lcd.write_string(aqi_str)

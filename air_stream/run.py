@@ -1,7 +1,7 @@
 import sys
 import time
 
-from main import load_params, pull_and_show, write_to_log
+from main import load_params, pull_and_show, write_to_log, clear_lcd
 
 
 def run() -> None:
@@ -12,15 +12,20 @@ def run() -> None:
     pi = "pi" in sys.argv
     if "repeat" in sys.argv:
         to_text = "text" in sys.argv
+        fails = 0
         while True:
             try:
                 to_text = pull_and_show(parameters, text=to_text, pi=pi)
+                fails = 0
             except Exception as e:
                 msg = f'\n{time.strftime("%m/%d %H:%M:%S", time.localtime())}: Cannot run this cycle: {e}'
                 write_to_log(msg)
                 import traceback
                 print(traceback.format_exc())
+                fails += 1
                 pass
+            if fails > 5:
+                clear_lcd()
             time.sleep(parameters["wait_between_steps_secs"])
     else:
         pull_and_show(parameters, pi=pi)
