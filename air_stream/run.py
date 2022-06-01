@@ -18,6 +18,8 @@ def run() -> None:
             except Exception as e:
                 msg = f'\n{time.strftime("%m/%d %H:%M:%S", time.localtime())}: Cannot run this cycle: {e}'
                 write_to_log(msg)
+                import traceback
+                print(traceback.format_exc())
                 pass
             time.sleep(parameters["wait_between_steps_secs"])
     else:

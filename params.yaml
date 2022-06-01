@@ -2,8 +2,8 @@
 
 # to find sensor number, go to https://www.purpleair.com/map, click on a sensor, and find in URL after "select="
 sensor_number: 38777
-nearby_sensors: [36529, 38725, 17951, 38577]
-wait_between_steps_secs: 60
+nearby_sensors: [36529, 17951, 75581, 65759]
+wait_between_steps_secs: 120
 
 ### alert params ###
 

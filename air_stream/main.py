@@ -31,8 +31,7 @@ def pull_and_show(
     )
     if pi:
         print_lcd(temp_f, aqi, outdoor_f, outdoor_aqi)
-    else:
-        print_terminal(temp_f, aqi, label, outdoor_f, outdoor_aqi)
+    print_terminal(temp_f, aqi, label, outdoor_f, outdoor_aqi)
     bad_air = aqi >= params["aqi_texting_threshold"]
     if text and bad_air:
         send_text_message(
@@ -67,9 +66,9 @@ def print_lcd(temp_f: float, aqi: float, outdoor_f: float, outdoor_aqi: float) -
     """
     Print to Rasperry Pi's LCD screen
     """
-    import CharLCD
-    import GPIO
-
+    from RPLCD.gpio import CharLCD
+    from RPi import GPIO
+    GPIO.setwarnings(False)
     lcd = CharLCD(
         cols=16,
         rows=2,
@@ -93,23 +92,32 @@ def get_realtime_data(sensor: int) -> Optional[Dict[str, Union[float, str]]]:
     """
     pull data for one sensor from purpleair.com
     """
-    response = requests.get(f"https://www.purpleair.com/json?show={sensor}")
+    # response = requests.get(f"https://www.purpleair.com/json?show={sensor}")
+    response = requests.get(f"https://api.purpleair.com/v1/sensors/{sensor}", headers={"X-API-Key": "3FE5554C-E1DF-11EC-8561-42010A800005"})
     try:
         rsp = response.json()
-    except (JSONDecodeError, ConnectionError) as ee:
+    except (ConnectionError) as ee:
         print(f"No values for sensor number {sensor}: {ee}")
         return None
-    rsp1, rsp2 = rsp["results"][0], rsp["results"][1]
-    label = rsp1["Label"]
-    temp_f = (
-        int(rsp1["temp_f"]) - 8
-    )  # purpleair subtracts 8 from the raw reading due to sensor heating
-    aqi_raw = (
-        float(rsp1["PM2_5Value"]) + float(rsp2["PM2_5Value"])
-    ) / 2.0  # average the sensors
-    aqi = aqi_from_pm(aqi_raw)
-    humidity = float(rsp1["humidity"])
+    # print('rrr', results)
+    # rsp1, rsp2 = rsp["results"][0], rsp["results"][1]
+    # label = rsp1["Label"]
+    # temp_f = (
+    #     int(rsp1["temp_f"]) - 8
+    # )  # purpleair subtracts 8 from the raw reading due to sensor heating
+    # aqi_raw = (
+    #     float(rsp1["PM2_5Value"]) + float(rsp2["PM2_5Value"])
+    # ) / 2.0  # average the sensors
+    # aqi = aqi_from_pm(aqi_raw)
+    # humidity = float(rsp1["humidity"])
+    # humidity = int(humidity + humidity * 0.1)  # 10% correction
+    results = rsp['sensor']
+    temp_f = results['temperature'] - 8
+    aqi = aqi_from_pm(results['pm2.5'])
+    label = results['name']
+    humidity = results['humidity']
     humidity = int(humidity + humidity * 0.1)  # 10% correction
+    
     ret_dict = {"temp_f": temp_f, "aqi": aqi, "humidity": humidity, "label": label}
     return ret_dict
 
